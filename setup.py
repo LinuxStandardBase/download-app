@@ -7,6 +7,6 @@ setup(
     include_package_data=True,
     zip_safe=False,
     install_requires=['Flask>=0.12', 'Flask-Script'],
-    packages=['downloadapp'],
+    packages=find_packages(),
     scripts=['bin/download_app.py']
 )
