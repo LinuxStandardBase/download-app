@@ -87,8 +87,16 @@ def get_appkits():
 
 
 def get_dtks():
-    return [{"name": "IA32 Distribution Test Kit",
-             "mgr_fn": "lsb-dist-testkit-manager-5.0.0-2.ia32.tar.gz",
-             "mgr_url": "https://ftp.linuxfoundation.org/pub/lsb/bundles/released-5.0.0/dist-testkit/lsb-dist-testkit-manager-5.0.0-2.ia32.tar.gz",
-             "full_fn": "lsb-dist-testkit-5.0.0-2.ia32.tar.gz",
-             "full_url": "https://ftp.linuxfoundation.org/pub/lsb/bundles/released-5.0.0/dist-testkit/lsb-dist-testkit-5.0.0-2.ia32.tar.gz"}]
+    identifiers = [('-manager-', "mgr"), ('', "full")]
+    dtk_paths = _get_grouped_paths(_get_paths("dist-testkit"),
+                                   identifiers)
+    for arch in sorted(dtk_paths.keys()):
+        mgr_fn = os.path.basename(dtk_paths[arch]["mgr"])
+        full_fn = os.path.basename(dtk_paths[arch]["full"])
+        yield {"name": arch_mapping[_arch_name_from_filename(full_fn)],
+               "mgr_fn": mgr_fn,
+               "mgr_url": os.path.join(app_config["base_url"],
+                                       dtk_paths[arch]["mgr"]),
+               "full_fn": full_fn,
+               "full_url": os.path.join(app_config["base_url"],
+                                        dtk_paths[arch]["full"])}
