@@ -9,6 +9,15 @@ app_config = {
 }
 
 
+arch_mapping = {"ia32": "32-bit Intel/AMD",
+                "ia64": "IA-64",
+                "x86_64": "64-bit Intel/AMD",
+                "ppc32": "POWER32",
+                "ppc64": "POWER64",
+                "s390": "31-bit System/z",
+                "s390x": "64-bit System/z"}
+
+
 def _get_released_bundle_dir(dirs):
     released_dir_versions = []
     for dir in dirs:
@@ -24,19 +33,25 @@ def _get_released_bundle_dir(dirs):
 
 
 def _arch_name_from_filename(fn):
-    arch_mapping = {"ia32": "32-bit Intel/AMD",
-                    "ia64": "IA-64",
-                    "x86_64": "64-bit Intel/AMD",
-                    "ppc32": "POWER32",
-                    "ppc64": "POWER64",
-                    "s390": "31-bit System/z",
-                    "s390x": "64-bit System/z"}
-
     m = re.search(r'([^\.]+)\.tar\.gz', fn)
     if m is not None:
-        return arch_mapping[m.group(1)]
+        return m.group(1)
     else:
         raise KeyError("could not find an architecture in the file name")
+
+
+def _get_grouped_paths(paths, identifiers):
+    results = {}
+    for path in paths:
+        fn = os.path.basename(path)
+        arch = _arch_name_from_filename(fn)
+        if arch not in results:
+            results[arch] = {}
+        for (regex, key) in identifiers:
+            if re.search(regex, fn):
+                results[arch][key] = path
+                break
+    return results
 
 
 def _get_paths(bundle_type):
@@ -50,17 +65,25 @@ def _get_paths(bundle_type):
 def get_sdks():
     for path in _get_paths("sdk"):
         fn = os.path.basename(path)
-        yield {"name": _arch_name_from_filename(fn),
+        yield {"name": arch_mapping[_arch_name_from_filename(fn)],
                "fn": fn,
                "url": os.path.join(app_config["base_url"], path)}
 
 
 def get_appkits():
-    return [{"name": "IA32 App Checker",
-             "pkg_fn": "lsb-app-checker-5.0.0-3.ia32.tar.gz",
-             "pkg_url": "https://ftp.linuxfoundation.org/pub/lsb/bundles/released-5.0.0/app-testkit/lsb-app-checker-5.0.0-3.ia32.tar.gz",
-             "local_fn": "lsb-app-checker-local-5.0.0-3.ia32.tar.gz",
-             "local_url": "https://ftp.linuxfoundation.org/pub/lsb/bundles/released-5.0.0/app-testkit/lsb-app-checker-local-5.0.0-3.ia32.tar.gz"}]
+    identifiers = [('-local', "local"), ('', "pkg")]
+    appkit_paths = _get_grouped_paths(_get_paths("app-testkit"),
+                                      identifiers)
+    for arch in sorted(appkit_paths.keys()):
+        pkg_fn = os.path.basename(appkit_paths[arch]["pkg"])
+        local_fn = os.path.basename(appkit_paths[arch]["local"])
+        yield {"name": arch_mapping[_arch_name_from_filename(pkg_fn)],
+               "pkg_fn": pkg_fn,
+               "pkg_url": os.path.join(app_config["base_url"],
+                                       appkit_paths[arch]["pkg"]),
+               "local_fn": local_fn,
+               "local_url": os.path.join(app_config["base_url"],
+                                         appkit_paths[arch]["local"])}
 
 
 def get_dtks():
