@@ -6,6 +6,7 @@ setup(
     long_description=__doc__,
     include_package_data=True,
     zip_safe=False,
+    test_suite="downloadapp.tests",
     install_requires=['Flask>=0.12', 'Flask-Script', 'flask-bootstrap'],
     packages=find_packages(),
     scripts=['bin/download_app.py']
