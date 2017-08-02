@@ -1,7 +1,93 @@
 {% extends "bootstrap/base.html" %}
 
-{% block title %}Test{% endblock %}
+{% block title %}LSB Downloads{% endblock %}
 
 {% block content %}
-<p>This is a test of the download app.</p>
+<div class="container">
+  <h1>Downloads</h1>
+
+  <p>The LSB project distributes four things: a specification, an SDK,
+    and two test kits, one each for distributions and applications.
+    All of these are provided for all seven architectures we currently
+    support: 32- and 64-bit Intel/AMD, 32- and 64-bit POWER, 31- and
+    64-bit IBM Z (s390 and s390x), and IA64.</p>
+
+  <h2>Specification</h2>
+
+  <p>The specification can be downloaded or read online
+    <a href="{{ spec_url }}">here</a>.  All architectures, as well as
+    generic specifications that are not architecture-specific, are
+    available.</p>
+
+  <h2>SDK</h2>
+
+  <p>The LSB SDK provides the ability to build C and C++ applications
+    to the LSB specification, making them portable across multiple
+    distributions without requiring multiple builds or builds on
+    obsolete distributions.</p>
+
+  <p>The LSB SDK is available as a single bundled download.
+    Installation instructions are provided inside the bundle.</p>
+
+  <table class="table">
+    {% for sdk_arch in sdks %}
+    <tr>
+      <td>{{ sdk_arch.name }}</td>
+      <td><a href="{{ sdk_arch.url }}">{{ sdk_arch.fn }}</a></td>
+    </tr>
+    {% endfor %}
+  </table>
+
+  <h2>Application Test Kit</h2>
+
+  <p>The LSB Application Checker contains utilities that can test
+    your application for compatibility with a number of popular
+    distributions, as well as the LSB.</p>
+
+  <p>It is available as a bundled download for local execution, as
+    well as a bundle for installation via the system package
+    manager.</p>
+
+  <table class="table">
+    <tr>
+      <th></th>
+      <th>Local Install</th>
+      <th>Package Install</th>
+    </tr>
+    {% for app_arch in appkits %}
+    <tr>
+      <td>{{ app_arch.name }}</td>
+      <td><a href="{{ app_arch.local_url }}">{{ app_arch.local_fn }}</a></td>
+      <td><a href="{{ app_arch.pkg_url }}">{{ app_arch.pkg_fn }}</a></td>
+    </tr>
+    {% endfor %}
+  </table>
+
+  <h2>Distribution Test Kit</h2>
+
+  <p>The LSB Distribution Test Kit tests a Linux distribution for
+    compatibility with the LSB.  It is based on the Distribution
+    Checker, a web app which provides an easy-to-use web UI for
+    testing a system.</p>
+
+  <p>It is available as an all-inclusive bundle, containing all the
+    tests, or a minimal bundle which downloads the tests on demand
+    during test execution.</p>
+
+  <table class="table">
+    <tr>
+      <th></th>
+      <th>Full Test Suite</th>
+      <th>Manager Only</th>
+    </tr>
+    {% for dtk_arch in dtks %}
+    <tr>
+      <td>{{ dtk_arch.name }}</td>
+      <td><a href="{{ dtk_arch.full_url }}">{{ dtk_arch.full_fn }}</a></td>
+      <td><a href="{{ dtk_arch.mgr_url }}">{{ dtk_arch.mgr_fn }}</a></td>
+    </tr>
+    {% endfor %}
+  </table>
+
+</div>
 {% endblock %}
